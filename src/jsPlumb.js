@@ -171,17 +171,17 @@
 			    	obj.bind(type, fn);
 			    },
 		    	domListeners = [],
-            	bindOne = function(o, c, evt) {
+            	bindOne = function(o, c, evt, adapter) {
 					var filteredEvent = eventFilters[evt] || evt,
 						fn = function(ee) {
 							c.fire(filteredEvent, c, ee);
 						};
 					domListeners.push([o, evt, fn]);
-					jpcl.bind(o, evt, fn);
+					adapter.bind(o, evt, fn);
 				},
-				unbindOne = function(o, evt, fn) {
+				unbindOne = function(o, evt, fn, adapter) {
 					var filteredEvent = eventFilters[evt] || evt;
-					jpcl.unbind(o, evt, fn);
+					adapter.unbind(o, evt, fn);
 				};
 
             this.bindListeners = function(obj, _self, _hoverFunction) {
@@ -214,17 +214,18 @@
 		    
 		    this.attachListeners = function(o, c) {
 				for (var i = 0, j = events.length; i < j; i++) {
-					bindOne(o, c, events[i]); 			
+					bindOne(o, c, events[i], this._jsPlumb.instance.touchAdapter); 			
 				}
 			};	
 			this.detachListeners = function() {
 				for (var i = 0; i < domListeners.length; i++) {
-					unbindOne(domListeners[i][0], domListeners[i][1], domListeners[i][2]);
+					unbindOne(domListeners[i][0], domListeners[i][1], domListeners[i][2], this._jsPlumb.instance.touchAdapter);
 				}
 				domListeners = null;
 			};	   		    
 		    
 		    this.reattachListenersForElement = function(o) {
+		    	// TODO this does not pass all the required args to unbindOne. how can it work?
 			    if (arguments.length > 1) {
 		    		for (var i = 0, j = events.length; i < j; i++)
 		    			unbindOne(o, events[i]);
@@ -590,6 +591,10 @@
 			};
 
 		var jsPlumbInstance = window.jsPlumbInstance = function(_defaults) {
+
+			this.touchAdapter = _touchAdapter = new TouchAdapter({
+				smartClicks:true
+			});
 				
 			this.Defaults = {
 				Anchor : "BottomCenter",
@@ -2471,8 +2476,8 @@
 	                        }
 						};
 
-						_currentInstance.registerListener(ep.canvas, "mouseup", _delTempEndpoint);
-	                    _currentInstance.registerListener(_el, "mouseup", _delTempEndpoint);
+						_touchAdapter.bind(ep.canvas, "mouseup", _delTempEndpoint);
+						_touchAdapter.bind(_el, "mouseup", _delTempEndpoint);
 						
 						// and then trigger its mousedown event, which will kick off a drag, which will start dragging
 						// a new connection from this endpoint.
@@ -2481,7 +2486,7 @@
 					};
 	               
 	                // register this on jsPlumb so that it can be cleared by a reset.
-	                _currentInstance.registerListener(_el, "mousedown", mouseDownListener);
+	                _touchAdapter.bind(_el, "mousedown", mouseDownListener);
 	                _sourceTriggers[elid] = mouseDownListener;
 
 	                // lastly, if a filter was provided, set it as a dragFilter on the element,
@@ -2509,7 +2514,8 @@
 				mouseDownListener = _sourceTriggers[info.id];
 			
 			if (mouseDownListener) 
-				_currentInstance.unregisterListener(info.el, "mousedown", mouseDownListener);
+				//_currentInstance.unregisterListener(info.el, "mousedown", mouseDownListener);
+				_touchAdapter.unbind(info.el, "mousedown", mouseDownListener);
 
 			if (!doNotClearArrays) {
 				delete _sourceEndpointDefinitions[info.id];
@@ -2651,7 +2657,7 @@
             	_currentInstance.anchorManager.clearFor(info.id);						
             	_currentInstance.anchorManager.removeFloatingConnection(info.id);
             }, doNotRepaint === false);
-            if(info.el) jsPlumb.CurrentLibrary.removeElement(info.el);
+            if(info.el) _touchAdapter.remove(info.el);
         };
 
 		var _registeredListeners = {},
@@ -2664,20 +2670,6 @@
 				}
 				_registeredListeners = {};
 			};
-
-        // internal register listener method.  gives us a hook to clean things up
-        // with if the user calls jsPlumb.reset.
-        this.registerListener = function(el, type, listener) {
-            jsPlumb.CurrentLibrary.bind(el, type, listener);
-            jsPlumbUtil.addToList(_registeredListeners, type, {el:el, event:type, listener:listener});
-        };
-
-        this.unregisterListener = function(el, type, listener) {
-        	jsPlumb.CurrentLibrary.unbind(el, type, listener);
-        	jsPlumbUtil.removeWithFunction(_registeredListeners, function(rl) {
-        		return rl.type == type && rl.listener == listener;
-        	});
-        };
 		
 		this.reset = function() {			
 			_currentInstance.deleteEveryEndpoint();
@@ -2690,8 +2682,8 @@
 			_sourceEndpoints = {};
 			_sourceEndpointsUnique = {};
 			_sourceMaxConnections = {};
-			connections.splice(0);
-			_unbindRegisteredListeners();
+			connections.splice(0);			
+			_touchAdapter.unbindAll();
 			_currentInstance.anchorManager.reset();
 			if (!jsPlumbAdapter.headless)
 				_currentInstance.dragManager.reset();
@@ -2821,7 +2813,7 @@
 			// entire document otherwise.
 			if (renderMode == jsPlumb.CANVAS) {
 				var bindOne = function(event) {
-	                jsPlumb.CurrentLibrary.bind(document, event, function(e) {
+					_touchAdapter.bind(document, event, function(e) {
 	                    if (!_currentInstance.currentlyDragging && renderMode == jsPlumb.CANVAS) {
 	                        // try connections first
 	                        for (i = 0, ii = connections.length; i < ii; i++ ) {

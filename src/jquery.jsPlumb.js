@@ -22,8 +22,7 @@
  * 
  * addClass				adds a class to the given element
  * animate				calls the underlying library's animate functionality
- * appendElement		appends a child element to a parent element.
- * bind					binds some event to an element
+ * appendElement		appends a child element to a parent element. 
  * dragEvents			a dictionary of event names
  * extend				extend some js object with another.  probably not overly necessary; jsPlumb could just do this internally.
  * getDragObject		gets the object that is being dragged, by extracting it from the arguments passed to a drag callback
@@ -50,7 +49,6 @@
  * setDragScope			sets the drag scope for a given element.
  * setOffset			sets the offset of some element.
  * trigger				triggers some event on an element.
- * unbind				unbinds some listener from some element.
  */
 (function($) {	
 	
@@ -107,16 +105,7 @@ TODO: REMOVE!
 			params = params || {};
 			params.type = params.type || "get";
 			$.ajax(params);
-		},
-		
-		/**
-		 * event binding wrapper.  it just so happens that jQuery uses 'bind' also.  yui3, for example,
-		 * uses 'on'.
-		 */
-		bind : function(el, event, callback) {
-			el = _getElementObject(el);
-			el.bind(event, callback);
-		},
+		},		
 
 		destroyDraggable : function(el) {
 			if ($(el).data("draggable"))
@@ -376,11 +365,6 @@ TODO: REMOVE!
 		trigger : function(el, event, originalEvent) {
 			var h = jQuery._data(_getElementObject(el)[0], "handle");
             h(originalEvent);
-		},
-		
-		unbind : function(el, event, callback) {
-			el = _getElementObject(el);
-			el.unbind(event, callback);
 		}
 	};
 	
