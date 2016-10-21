@@ -2280,7 +2280,7 @@
                     var elInfo = _info(el),
                         elid = elInfo.id,
                         dropOptions = root.jsPlumb.extend({}, p.dropOptions || {}),
-                        type = "default";
+                        type = p.connectionType || "default";
 
                     this.targetEndpointDefinitions[elid] = this.targetEndpointDefinitions[elid] || {};
 
