@@ -354,7 +354,7 @@ export class EndpointDragHandler implements DragHandler {
 
         this.instance.getSelector(this.instance.getContainer(), selectors.join(",")).forEach((candidate:any) => {
 
-            if (candidate !== this.ep.element) {
+            if (this.jpc != null || candidate !== this.ep.element) {
                 const o = this.instance.getOffset(candidate), s = this.instance.getSize(candidate);
                 boundingRect = {x: o.left, y: o.top, w: s[0], h: s[1]};
                 let d: any = {el: candidate, r: boundingRect};
