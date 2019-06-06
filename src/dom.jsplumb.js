@@ -676,7 +676,7 @@
 
             _currentInstance.getSelector(_currentInstance.getContainer(), selectors.join(",")).forEach(function(candidate) {
 
-                if (candidate !== ep.element) {
+                if (jpc != null || candidate !== ep.element) {
 
                     var o = _currentInstance.getOffset(candidate), s = _currentInstance.getSize(candidate);
                     boundingRect = {x: o.left, y: o.top, w: s[0], h: s[1]};
