@@ -400,12 +400,7 @@
                 return [ el.parentNode.scrollWidth, el.parentNode.scrollHeight ];
             },
             getPosition: function (el, relativeToRoot) {
-                // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
-                // compute against the Container's origin. see also the getUIPosition method below.
-                //var o = _currentInstance.getOffset(el, relativeToRoot, el._katavorioDrag ? el.offsetParent : null);
-                //var o = _currentInstance.getOffset(el, relativeToRoot, el._jsPlumbGroup ? el.offsetParent : null);
                 var o = _currentInstance.getOffset(el, relativeToRoot, el.offsetParent);
-                console.log("get position ", el.id, o.left, o.top);
                 return [o.left, o.top];
             },
             setPosition: function (el, xy) {
@@ -444,7 +439,11 @@
             },
             revert:function(dragEl, pos) {
                 // if drag el not removed from DOM (pruned by a group), and it has a group which has revert:true, then revert.
-                return dragEl.parentNode != null && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
+                return dragEl.parentNode != null && !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
+            },
+            ghostProxy:function(canvasEl, dragEl) {
+                console.log("should ghost proxy?", arguments);
+                return !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.ghost;
             }
         });
 
@@ -475,13 +474,14 @@
         function _pruneOrOrphan(p) {
             var orphanedPosition = null;
             if (!_isInsideParent(p.el, p.pos)) {
-                var group = p.el._jsPlumbGroup;
+                var nodeEl = p.drag.getDragElement(true);
+                var group = nodeEl._jsPlumbGroup;
                 if (group.prune) {
-                    group.remove(p.el);
-                    _currentInstance.remove(p.el);
+                    group.remove(nodeEl);
+                    _currentInstance.remove(nodeEl);
                 } else if (group.orphan) {
-                    orphanedPosition = _currentInstance.getGroupManager().orphan(p.el);
-                    group.remove(p.el);
+                    orphanedPosition = _currentInstance.getGroupManager().orphan(nodeEl);
+                    group.remove(nodeEl);
                 }
 
             }
