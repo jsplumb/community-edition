@@ -2153,7 +2153,7 @@
         this.unmark = function(e, doNotCheckDroppables) {
             _setDroppablesActive(matchingDroppables, false, true, this);
 
-            if (isConstrained && useGhostProxy(elementToDrag)) {
+            if (isConstrained && useGhostProxy(elementToDrag, dragEl)) {
                 ghostProxyOffsets = [dragEl.offsetLeft - ghostDx, dragEl.offsetTop - ghostDy];
                 dragEl.parentNode.removeChild(dragEl);
                 dragEl = elementToDrag;
@@ -2183,7 +2183,7 @@
                 cPos = constrain(desiredLoc, dragEl, constrainRect, this.size);
 
             // if we should use a ghost proxy...
-            if (useGhostProxy(this.el)) {
+            if (useGhostProxy(this.el, dragEl)) {
                 // and the element has been dragged outside of its parent bounds
                 if (desiredLoc[0] !== cPos[0] || desiredLoc[1] !== cPos[1]) {
 
@@ -11631,7 +11631,7 @@
             return da && da.length > 0 ? da[0] : el;
         };
 
-        var ghost = params.ghost === true;
+        var ghost = this.ghost = params.ghost === true;
         var constrain = this.constrain = ghost || (params.constrain === true);
         var revert = this.revert = params.revert !== false;
         var orphan = this.orphan = params.orphan === true;
@@ -13742,12 +13742,7 @@
                 return [ el.parentNode.scrollWidth, el.parentNode.scrollHeight ];
             },
             getPosition: function (el, relativeToRoot) {
-                // if this is a nested draggable then compute the offset against its own offsetParent, otherwise
-                // compute against the Container's origin. see also the getUIPosition method below.
-                //var o = _currentInstance.getOffset(el, relativeToRoot, el._katavorioDrag ? el.offsetParent : null);
-                //var o = _currentInstance.getOffset(el, relativeToRoot, el._jsPlumbGroup ? el.offsetParent : null);
                 var o = _currentInstance.getOffset(el, relativeToRoot, el.offsetParent);
-                console.log("get position ", el.id, o.left, o.top);
                 return [o.left, o.top];
             },
             setPosition: function (el, xy) {
@@ -13786,7 +13781,11 @@
             },
             revert:function(dragEl, pos) {
                 // if drag el not removed from DOM (pruned by a group), and it has a group which has revert:true, then revert.
-                return dragEl.parentNode != null && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
+                return dragEl.parentNode != null && !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
+            },
+            ghostProxy:function(canvasEl, dragEl) {
+                console.log("should ghost proxy?", arguments);
+                return !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.ghost;
             }
         });
 
@@ -13817,13 +13816,14 @@
         function _pruneOrOrphan(p) {
             var orphanedPosition = null;
             if (!_isInsideParent(p.el, p.pos)) {
-                var group = p.el._jsPlumbGroup;
+                var nodeEl = p.drag.getDragElement(true);
+                var group = nodeEl._jsPlumbGroup;
                 if (group.prune) {
-                    group.remove(p.el);
-                    _currentInstance.remove(p.el);
+                    group.remove(nodeEl);
+                    _currentInstance.remove(nodeEl);
                 } else if (group.orphan) {
-                    orphanedPosition = _currentInstance.getGroupManager().orphan(p.el);
-                    group.remove(p.el);
+                    orphanedPosition = _currentInstance.getGroupManager().orphan(nodeEl);
+                    group.remove(nodeEl);
                 }
 
             }
@@ -14018,7 +14018,7 @@
 
             _currentInstance.getSelector(_currentInstance.getContainer(), selectors.join(",")).forEach(function(candidate) {
 
-                if (candidate !== ep.element) {
+                if (jpc != null || candidate !== ep.element) {
 
                     var o = _currentInstance.getOffset(candidate), s = _currentInstance.getSize(candidate);
                     boundingRect = {x: o.left, y: o.top, w: s[0], h: s[1]};
