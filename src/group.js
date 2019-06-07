@@ -387,7 +387,7 @@
             return da && da.length > 0 ? da[0] : el;
         };
 
-        var ghost = params.ghost === true;
+        var ghost = this.ghost = params.ghost === true;
         var constrain = this.constrain = ghost || (params.constrain === true);
         var revert = this.revert = params.revert !== false;
         var orphan = this.orphan = params.orphan === true;
