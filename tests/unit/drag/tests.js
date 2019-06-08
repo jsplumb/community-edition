@@ -711,7 +711,7 @@ var testSuite = function (_jsPlumb) {
     });
 
 
-    // DRAG SOURCE TO AN ELEMENT NO CONFIGURED AS SOURCE (SHOULD DETACH)
+    // DRAG SOURCE TO AN ELEMENT NO CONFIGURED AS SOURCE (SHOULD DETACH and the endpoints should be deleted, as they should be set to deleteOnEmpty)
     test("connection dragging, move source to element not configured as drag source", function() {
         var d1 = support.addDiv("d1"), d2 = support.addDiv("d2"), d3 = support.addDiv("d3"), d4 = support.addDiv("d4");
         _jsPlumb.makeSource([d1, d2, d3], { });
