@@ -1582,6 +1582,15 @@
         for (var i = 0; i < availableSelectors.length; i++) {
             el = findDelegateElement(parentElement, childElement, prefix + availableSelectors[i].selector);
             if (el != null) {
+                if (availableSelectors[i].filter) {
+                    var matches = matchesSelector(childElement, availableSelectors[i].filter, el),
+                        exclude = availableSelectors[i].filterExclude === true;
+
+                    if ( (exclude && !matches) || matches) {
+                        return null;
+                    }
+
+                }
                 return [ availableSelectors[i], el ];
             }
         }
@@ -13784,7 +13793,6 @@
                 return dragEl.parentNode != null && !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
             },
             ghostProxy:function(canvasEl, dragEl) {
-                console.log("should ghost proxy?", arguments);
                 return !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.ghost;
             }
         });
@@ -13876,6 +13884,7 @@
         endpointDragOptions.start = function(p) {
 
             currentDropTarget = null;
+            _stopped = false;
 
             ep = p.drag.getDragElement()._jsPlumb;
             if (!ep) {
@@ -14061,7 +14070,7 @@
 
             });
 
-            console.log(endpointDropTargets);
+            //console.log(endpointDropTargets);
             endpointDropTargets.sort(function(a, b) {
                 if (a.rank != null && b.rank != null) {
                     return a.rank > b.rank ? -1 : a.rank < b.rank ? 1 : 0;
@@ -14069,7 +14078,7 @@
                     return 0;
                 }
             });
-            console.log(endpointDropTargets);
+            //console.log(endpointDropTargets);
 
             ep.setHover(false, false);
 
