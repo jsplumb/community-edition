@@ -442,7 +442,6 @@
                 return dragEl.parentNode != null && !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.revert ? !_isInsideParent(dragEl, pos) : false;
             },
             ghostProxy:function(canvasEl, dragEl) {
-                console.log("should ghost proxy?", arguments);
                 return !dragEl._isJsPlumbGroup && dragEl._jsPlumbGroup && dragEl._jsPlumbGroup.ghost;
             }
         });
@@ -534,6 +533,7 @@
         endpointDragOptions.start = function(p) {
 
             currentDropTarget = null;
+            _stopped = false;
 
             ep = p.drag.getDragElement()._jsPlumb;
             if (!ep) {
@@ -719,7 +719,7 @@
 
             });
 
-            console.log(endpointDropTargets);
+            //console.log(endpointDropTargets);
             endpointDropTargets.sort(function(a, b) {
                 if (a.rank != null && b.rank != null) {
                     return a.rank > b.rank ? -1 : a.rank < b.rank ? 1 : 0;
@@ -727,7 +727,7 @@
                     return 0;
                 }
             });
-            console.log(endpointDropTargets);
+            //console.log(endpointDropTargets);
 
             ep.setHover(false, false);
 
