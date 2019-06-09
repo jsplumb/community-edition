@@ -676,7 +676,7 @@
 
             _currentInstance.getSelector(_currentInstance.getContainer(), selectors.join(",")).forEach(function(candidate) {
 
-                if (jpc != null || candidate !== ep.element) {
+                //if (jpc != null /*|| candidate !== ep.element*/) {
 
                     var o = _currentInstance.getOffset(candidate), s = _currentInstance.getSize(candidate);
                     boundingRect = {x: o.left, y: o.top, w: s[0], h: s[1]};
@@ -691,12 +691,15 @@
                     });
                     //}
 
-                    //if (epIsTarget) {
-                    // look for at least one target definition that is not disabled on the given element.
-                    sourceDefinitionIdx = _ju.findWithFunction(candidate._jsPlumbSourceDefinitions, function (tdef) {
-                        return tdef.enabled !== false;
-                    });
-                    //}
+                    // if an existing connection, it could be connected back to a source. otherwise it cannot be dropped on a source, as its
+                    // a new connection. i think the logic here still needs tweaking: ideally we would only do this if the floating endpoint on the current, not null,
+                    // connection, was a source endpoint
+                    if (jpc != null) {
+                        // look for at least one target definition that is not disabled on the given element.
+                        sourceDefinitionIdx = _ju.findWithFunction(candidate._jsPlumbSourceDefinitions, function (tdef) {
+                            return tdef.enabled !== false;
+                        });
+                    }
 
                     // if there is at least one enabled target definition (if appropriate), add this element to the drop targets
                     if (targetDefinitionIdx !== -1) {
@@ -715,7 +718,7 @@
                         endpointDropTargets.push(d);
                         _currentInstance.addClass(candidate, _currentInstance.Defaults.dropOptions.activeClass || "jtk-drag-active"); // TODO get from defaults.
                     }
-                }
+                //}
 
             });
 
@@ -912,21 +915,50 @@
         function _maybeReattach(idx, originalEvent) {
             if (jpc.suspendedEndpoint) {
 
-                if (jpc.isReattach() || jpc._forceReattach || jpc._forceDetach || !_currentInstance.deleteConnection(jpc, {originalEvent: originalEvent})) {
+                // if (idx === 0) {
+                //     //floatingId = jpc.sourceId;
+                //     // jpc.source = jpc.suspendedEndpoint.element;
+                //     // jpc.sourceId = jpc.suspendedEndpoint.elementId;
+                // } else {
+                    //floatingId = jpc.targetId;
+                    // jpc.target = jpc.suspendedEndpoint.element;
+                    // jpc.targetId = jpc.suspendedEndpoint.elementId;
 
-                    var floatingId;
-                    jpc.endpoints[idx] = jpc.suspendedEndpoint;
-                    jpc.setHover(false);
-                    jpc._forceDetach = true;
+
                     if (idx === 0) {
-                        floatingId = jpc.sourceId;
+                        // jpc.floatingElement = jpc.source;
+                        // jpc.floatingId = jpc.sourceId;
+                        // jpc.floatingEndpoint = jpc.endpoints[0];
+                        // jpc.floatingIndex = 0;
                         jpc.source = jpc.suspendedEndpoint.element;
                         jpc.sourceId = jpc.suspendedEndpoint.elementId;
                     } else {
-                        floatingId = jpc.targetId;
+                        // keep a copy of the floating element; the anchor manager will want to clean up.
+                        // jpc.floatingElement = jpc.target;
+                        // jpc.floatingId = jpc.targetId;
+                        // jpc.floatingEndpoint = jpc.endpoints[1];
+                        // jpc.floatingIndex = 1;
                         jpc.target = jpc.suspendedEndpoint.element;
                         jpc.targetId = jpc.suspendedEndpoint.elementId;
                     }
+
+                jpc.endpoints[idx] = jpc.suspendedEndpoint;
+                jpc.setHover(false);
+
+                if (jpc.isReattach() || jpc._forceReattach || jpc._forceDetach || !_currentInstance.deleteConnection(jpc, {originalEvent: originalEvent})) {
+
+                    //var floatingId;
+
+                    jpc._forceDetach = null;
+                    // if (idx === 0) {
+                    //     floatingId = jpc.sourceId;
+                    //     jpc.source = jpc.suspendedEndpoint.element;
+                    //     jpc.sourceId = jpc.suspendedEndpoint.elementId;
+                    // } else {
+                    //     floatingId = jpc.targetId;
+                    //     jpc.target = jpc.suspendedEndpoint.element;
+                    //     jpc.targetId = jpc.suspendedEndpoint.elementId;
+                    // }
                     jpc.suspendedEndpoint.addConnection(jpc);
 
                     // TODO checkSanity
@@ -1042,7 +1074,7 @@
 
                 // need to figure the conditions under which each of these should be tested
                 if (targetDefinition == null) {
-                    targetDefinition = (jpc.floatingIndex == null || jpc.floatingIndex === 0) ? getSourceDefinition(currentDropTarget.el, p.e) : null;
+                    targetDefinition = (jpc.floatingIndex == null || jpc.floatingIndex === 0) ? getSourceDefinition(currentDropTarget.el, p.e, true) : null;
                 }
                 
                 if (targetDefinition == null) {
@@ -1289,14 +1321,16 @@
         //
         // Source definitions on the given element are tested in the order they appear in the array. There is currently no way to
         // rank these.
+        // this method can also be called when a connection has been dragged off by its source, in which case `actingAsTarget` will be set
+        // and we want to ignore the filter on the source definition, as the connection can be dropped anywhere.
         //
-        function getSourceDefinition(fromElement, evt) {
+        function getSourceDefinition(fromElement, evt, actingAsTarget) {
             var sourceDef;
             if (fromElement._jsPlumbSourceDefinitions) {
                 for (var i = 0; i < fromElement._jsPlumbSourceDefinitions.length; i++) {
                     sourceDef = fromElement._jsPlumbSourceDefinitions[i];
                     if (sourceDef.enabled !== false) {
-                        if (sourceDef.def.filter) {
+                        if (!actingAsTarget && sourceDef.def.filter) {
                             var r = _ju.isString(sourceDef.def.filter) ? selectorFilter(evt, fromElement, sourceDef.def.filter, _currentInstance, sourceDef.def.filterExclude) : sourceDef.def.filter(evt, fromElement);
                             if (r !== false) {
                                 return sourceDef;
@@ -1335,7 +1369,7 @@
              }
 
              var elid = _currentInstance.getId(this),
-                 targetEl = e.target || e.srcElement, sourceDef = getSourceDefinition(this, e, elid), sourceElement = this, def;
+                 targetEl = e.target || e.srcElement, sourceDef = getSourceDefinition(this, e), sourceElement = this, def;
 
              if (sourceDef) {
                  def = sourceDef.def;
