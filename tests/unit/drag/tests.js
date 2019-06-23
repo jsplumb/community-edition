@@ -183,9 +183,10 @@ var testSuite = function (_jsPlumb) {
         // as a test: connect d3 to itself. 2 endpoints?
         var d3d3 = support.dragConnection(d3, d3);
         equal(_jsPlumb.selectEndpoints().length, 2, "two endpoints");
+        equal(_jsPlumb.select().length, 1, "one connection after drag");
 
         var d2d1 = support.dragConnection(d2, d1);
-        equal(_jsPlumb.select().length, 2, "one connection after drag");
+        equal(_jsPlumb.select().length, 2, "two connections after second drag");
 
         support.relocateSource(d2d1, d1);
         equal(d2d1.endpoints[0].elementId, "d1", "source endpoint is on d1 now");
