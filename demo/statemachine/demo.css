@@ -102,3 +102,11 @@
 }
 
 path, .jtk-endpoint { cursor:pointer; }
+
+.jtk-drag-active {
+    border: 1px solid forestgreen;
+}
+
+.jtk-drag-hover {
+    border: 1px solid darkorange;
+}
