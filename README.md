@@ -2,6 +2,8 @@
 
 This project is the Community edition of jsPlumb. It is open source and MIT/GPL2 licensed. If you're looking for the Toolkit edition please visit [https://jsplumbtoolkit.com](https://jsplumbtoolkit.com).
 
+Up until version 6.2.10 the Toolkit edition used this project as its view layer, but from 6.3.0 onwards the Toolkit edition's rendering code has diverged from this project, and in the upcoming 7.x version will diverge even further, so the future of this project is currently unclear. One option is to make the Toolkit edition free for all non-commercial use, and stop development of this project - we're interested in any feedback you may have on this proposal. 
+
 If you're new to jsPlumb, please do take the time to read the [documentation](https://docs.jsplumbtoolkit.com/community/). 
 There are a few integration issues that you should be aware of: z-index needs special attention, for example.
 
