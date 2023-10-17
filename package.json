@@ -28,7 +28,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/jsplumb/jsplumb.git"
+    "url": "git://github.com/jsplumb/community-edition.git"
   },
   "keywords": [
     "javascript",
