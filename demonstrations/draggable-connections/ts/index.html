@@ -1,0 +1,41 @@
+<!doctype html>
+<html>
+    <head>
+
+        <title>jsPlumb - draggable connectors demonstration</title>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+        <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+        <link href="//fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+
+        <link rel="stylesheet" href="node_modules/@jsplumb/browser-ui/css/jsplumbtoolkit.css">
+        <link rel="stylesheet" href="../demo.css">
+    </head>
+    <body>
+        <!-- content -->
+        <div class="jtk-demo-main">
+            <div class="jtk-demo-canvas canvas-wide drag-drop-demo jtk-surface jtk-surface-nopan" id="canvas">
+                <div class="window" id="dragDropWindow1">one<br/><br/><a href="#" class="cmdLink hide">toggle connections</a><br/><a href="#" class="cmdLink drag" rel="dragDropWindow1">disable dragging</a><br/><a href="#" class="cmdLink detach" rel="dragDropWindow1">detach all</a></div>
+                <div class="window" id="dragDropWindow2">two<br/><br/><a href="#" class="cmdLink hide">toggle connections</a><br/><a href="#" class="cmdLink drag" rel="dragDropWindow2">disable dragging</a><br/><a href="#" class="cmdLink detach" rel="dragDropWindow2">detach all</a></div>
+                <div class="window" id="dragDropWindow3">three<br/><br/><a href="#" class="cmdLink hide">toggle connections</a><br/><a href="#" class="cmdLink drag" rel="dragDropWindow3">disable dragging</a><br/><a href="#" class="cmdLink detach" rel="dragDropWindow3">detach all</a></div>
+                <div class="window" id="dragDropWindow4">four<br/><br/><a href="#" class="cmdLink hide">toggle connections</a><br/><a href="#" class="cmdLink drag" rel="dragDropWindow4">disable dragging</a><br/><a href="#" class="cmdLink detach" rel="dragDropWindow4">detach all</a></div>
+                <div id="list"></div>
+            </div>
+            <div class="description">
+                <h4>DRAG &amp; DROP</h4>
+                <p>Drag from any Endpoint to similar Endpoints on other elements to create Connections.</p>
+                <p>Blue Endpoints use a <strong>beforeDrop</strong> interceptor.  This enables
+                    you to intercept a new connection and decide whether or not you wish to allow it to proceed. They are also configured to automatically reattach if you drag a Connection off and drop it on the background.</p>
+                <p>Yellow Endpoints are configured to use a <strong>beforeDetach</strong> interceptor, which provides a way to programmatically override a Connection detach. Yellow connections are painted with the Straight connector</p>
+                <p>Green Endpoints support up to three Connections. Once a green Endpoint has three connections, when you drag from it you will drag the oldest connection made on the Endpoint.</p>
+                <div class="commands">
+                    <a id="clear" class="cmd" href="#">clear plumbing</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- /content -->
+        <script src="_build/demo.umd.js"></script>
+
+    </body>
+</html>

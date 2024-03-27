@@ -1,0 +1,39 @@
+{
+  "name": "hierarchy",
+  "version": "6.0.0",
+  "description": "",
+  "main": "demo.js",
+  "scripts": {
+    "rollup": "rollup -c rollup.config.js",
+    "tsc": "tsc",
+    "refresh": "rm -rf node_modules/@jsplumb;npm i;npm run rollup"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsplumb-demonstrations/hierarchy.git"
+  },
+  "author": "jsPlumb <hello@jsplumbtoolkit.com> (https://jsplumbtoolkit.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsplumb-demonstrations/hierarchy/issues"
+  },
+  "homepage": "https://github.com/jsplumb-demonstrations/hierarchy#readme",
+  "dependencies": {
+    "@jsplumb/browser-ui": "^6.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-typescript": "^7.3.3",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "babel-loader": "^8.0.6",
+    "rollup": "^2.26.11",
+    "typescript": "^4.0.0",
+    "@types/estree":"1.0.0"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "state-machine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "demo.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsplumb-demonstrations/state-machine.git"
+  },
+  "author": "jsPlumb <hello@jsplumbtoolkit.com> (https://jsplumbtoolkit.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jsplumb-demonstrations/state-machine/issues"
+  },
+  "homepage": "https://github.com/jsplumb-demonstrations/state-machine#readme",
+  "dependencies": {
+    "@jsplumb/browser-ui": "^5.0.0",
+    "@jsplumb/connector-bezier": "^5.0.0"
+  }
+}
