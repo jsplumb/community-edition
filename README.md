@@ -1,14 +1,15 @@
-# jsPlumb Community Edition
+# JsPlumb Community Edition
 
-This project is the Community edition of jsPlumb. It is open source and MIT/GPL2 licensed. If you're looking for the Toolkit edition please visit [https://jsplumbtoolkit.com](https://jsplumbtoolkit.com).
+This project is the Community edition of jsPlumb. It is open source and MIT/GPL2 licensed. It is also quite old now. You might want to take a look at [VisuallyJs](https://visuallyjs.com), which is the latest version of JsPlumb, and is **free for non-commercial usage**.
+
+
+## Introduction
+
 
 This repository was created in October 2023 to be the new home of the original repository - [https://github.com/jsplumb/jsplumb](https://github.com/jsplumb/jsplumb).
 
 If you're new to jsPlumb, please do take the time to read the [documentation](https://docs.jsplumbtoolkit.com/community/). 
 There are a few integration issues that you should be aware of: z-index needs special attention, for example.
-
-**This project is not the correct place to report issues for the Toolkit edition**. The Toolkit is not a public project. Issues reported for the Toolkit edition in this issue tracker will be deleted.
-
 
 ## Packages
 
