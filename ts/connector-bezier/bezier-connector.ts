@@ -18,12 +18,14 @@ export class BezierConnector extends AbstractBezierConnector {
 
     majorAnchor:number
     minorAnchor:number
+    straightMargin:number
 
     constructor(public connection:Connection, params:BezierOptions) {
         super(connection, params)
         params = params || {}
         this.majorAnchor = params.curviness || 150
         this.minorAnchor = 10
+        this.straightMargin = params.margin || null
     }
 
     getCurviness ():number {
@@ -38,14 +40,14 @@ export class BezierConnector extends AbstractBezierConnector {
 
         if (!perpendicular) {
             if (soo[0] === 0) {
-                p.x = (sourceAnchorPosition.curX < targetAnchorPosition.curX ? point.x + this.minorAnchor : point.x - this.minorAnchor)
+                p.x = this._computeMinorPoint(sourceAnchorPosition.curX, targetAnchorPosition.curX, point.x)
             }
             else {
                 p.x = (point.x - (this.majorAnchor * soo[0]))
             }
 
             if (soo[1] === 0) {
-                p.y = (sourceAnchorPosition.curY < targetAnchorPosition.curY ? point.y + this.minorAnchor : point.y - this.minorAnchor)
+                p.y = this._computeMinorPoint(sourceAnchorPosition.curY, targetAnchorPosition.curY, point.y)
             }
             else {
                 p.y = (point.y + (this.majorAnchor * too[1]))
@@ -53,14 +55,14 @@ export class BezierConnector extends AbstractBezierConnector {
         }
         else {
             if (too[0] === 0) {
-                p.x = (targetAnchorPosition.curX < sourceAnchorPosition.curX ? point.x + this.minorAnchor : point.x - this.minorAnchor)
+                p.x = this._computeMinorPoint(targetAnchorPosition.curX, sourceAnchorPosition.curX, point.x)
             }
             else {
                 p.x = (point.x + (this.majorAnchor * too[0]))
             }
 
             if (too[1] === 0) {
-                p.y = (targetAnchorPosition.curY < sourceAnchorPosition.curY ? point.y + this.minorAnchor : point.y - this.minorAnchor)
+                p.y = this._computeMinorPoint(targetAnchorPosition.curY, sourceAnchorPosition.curY, point.y)
             }
             else {
                 p.y = (point.y + (this.majorAnchor * soo[1]))
@@ -68,6 +70,15 @@ export class BezierConnector extends AbstractBezierConnector {
         }
 
         return p
+    }
+
+    _computeMinorPoint (sourcePosition:number, targetPosition :number, pointPosition:number):number {
+        // if the two points are very close to each other, don't offset the control point
+        if (this.straightMargin && Math.abs(sourcePosition - targetPosition) < this.straightMargin) {
+            return pointPosition
+        }            
+
+        return sourcePosition < targetPosition ? pointPosition + this.minorAnchor : pointPosition - this.minorAnchor
     }
 
     _computeBezier (paintInfo:PaintGeometry, p:ConnectorComputeParams, sp:AnchorPlacement, tp:AnchorPlacement, _w:number, _h:number):void {
